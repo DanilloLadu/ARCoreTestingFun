@@ -3,6 +3,7 @@ package com.example.halloar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -37,8 +38,9 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private int[] _lengthWidthHeight = new int[3];
+    private float[] _lengthWidthHeight = new float[3];
 
+    private DimentionState DIMENTION_STATE = DimentionState.NONE;
 
     private Boolean FIRST_NODE_EXISTS = false;
     private Boolean SECOND_NODE_EXISTS = false;
@@ -46,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private AnchorNode _secondCurrentAnchorNode;
     private TextView tvDistance;
     private TextView tvLength;
+    private TextView tvWidth;
+    private TextView tvHeight;
     ModelRenderable cubeRenderable;
     private Anchor _firstCurrentAnchor = null;
     private Anchor _secondCurrentAnchor = null;
@@ -69,7 +73,9 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
         tvDistance = findViewById(R.id.tvDistance);
-
+        tvHeight = findViewById(R.id.tvHeight);
+        tvWidth = findViewById(R.id.tvWidth);
+        tvLength = findViewById(R.id.tvLength);
 
         initModel();
 
@@ -220,6 +226,24 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 tvDistance.setText("Difference: " + distanceMeters + " metres");
 
 
+
+                if(DIMENTION_STATE == DimentionState.LENGTH && (_lengthWidthHeight[0] == 0)){
+                    _lengthWidthHeight[0] =  distanceMeters;
+                    tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
+
+
+                }else if(DIMENTION_STATE == DimentionState.WIDTH && (_lengthWidthHeight[1] == 0) ){
+                    _lengthWidthHeight[1] =  distanceMeters;
+                    tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
+
+                }else if(DIMENTION_STATE == DimentionState.HEIGHT && (_lengthWidthHeight[2] == 0)) {
+                    _lengthWidthHeight[2] = distanceMeters;
+                    tvHeight.setText("H: " + String.valueOf(_lengthWidthHeight[2]));
+
+                }
+
+
+
             /*float[] distance_vector = currentAnchor.getPose().inverse()
                     .compose(cameraPose).getTranslation();
             float totalDistanceSquared = 0;
@@ -228,9 +252,50 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
 
 
+        }else{
+
+
         }
 
 
+
+
+    }
+
+
+
+    @SuppressLint("ResourceAsColor")
+    public void tappedToSetDimentionStateToLength(View v){
+        if(DIMENTION_STATE == DimentionState.LENGTH){
+            DIMENTION_STATE = DimentionState.NONE;
+            tvLength.setBackgroundColor(android.graphics.Color.BLACK);
+            _lengthWidthHeight[0] = 0;
+        }else{
+            DIMENTION_STATE = DimentionState.LENGTH;
+            tvLength.setBackgroundColor(android.graphics.Color.BLUE);
+        }
+    }
+
+    public void tappedToSetDimentionStateToWidth(View v){
+        if(DIMENTION_STATE == DimentionState.WIDTH){
+            DIMENTION_STATE = DimentionState.NONE;
+            tvWidth.setBackgroundColor(android.graphics.Color.BLACK);
+            _lengthWidthHeight[1] = 0;
+        }else {
+            DIMENTION_STATE = DimentionState.WIDTH;
+            tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
+        }
+    }
+
+    public void tappedToSetDimentionStateToHeight(View v){
+        if(DIMENTION_STATE == DimentionState.HEIGHT){
+            DIMENTION_STATE = DimentionState.NONE;
+            tvHeight.setBackgroundColor(android.graphics.Color.BLACK);
+            _lengthWidthHeight[2] = 0;
+        }else{
+            DIMENTION_STATE = DimentionState.HEIGHT;
+            tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
+        }
 
 
     }

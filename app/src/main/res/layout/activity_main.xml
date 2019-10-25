@@ -17,7 +17,7 @@
       android:background="@android:color/black"
       android:gravity="center"
       android:padding="8dp"
-      android:text="Distance from camera"
+      android:text=""
       android:textColor="@android:color/white"
       android:textSize="20sp" />
 
@@ -31,7 +31,10 @@
       android:padding="8dp"
       android:text="L"
       android:textColor="@android:color/white"
-      android:textSize="20sp" />
+      android:textSize="20sp"
+      android:clickable="true"
+      android:onClick="tappedToSetDimentionStateToLength"/>
+
 
   <TextView
       android:id="@+id/tvWidth"
@@ -43,7 +46,9 @@
       android:padding="8dp"
       android:text="B"
       android:textColor="@android:color/white"
-      android:textSize="20sp" />
+      android:textSize="20sp"
+      android:clickable="true"
+      android:onClick="tappedToSetDimentionStateToWidth"/>
 
   <TextView
       android:id="@+id/tvHeight"
@@ -55,7 +60,9 @@
       android:padding="8dp"
       android:text="H"
       android:textColor="@android:color/white"
-      android:textSize="20sp" />
+      android:textSize="20sp"
+      android:clickable="true"
+      android:onClick="tappedToSetDimentionStateToHeight"/>
 
 
 </FrameLayout>
