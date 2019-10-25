@@ -1,0 +1,75 @@
+{
+  animations: [
+    {
+      path: 'sampledata/EsserTest.fbx',
+    },
+  ],
+  materials: [
+    {
+      name: 'Material_52',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '285',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 1,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 0.2,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'Color',
+      'TexCoord',
+      'Orientation',
+      'BoneIndices',
+      'BoneWeights',
+    ],
+    collision: {},
+    file: 'sampledata/EsserTest.fbx',
+    name: 'EsserTest',
+    recenter: 'root',
+    scale: 60.999995999999999,
+  },
+  samplers: [
+    {
+      file: 'sampledata\\EsserTest.fbm\\285.png',
+      name: '285',
+      pipeline_name: 'EsserTest.fbm\\285.png',
+    },
+    {
+      file: 'sampledata\\EsserTest.fbm\\289.png',
+      name: '289',
+      pipeline_name: 'EsserTest.fbm\\289.png',
+    },
+  ],
+  version: '0.54:2',
+}
