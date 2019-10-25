@@ -230,15 +230,20 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 if(DIMENTION_STATE == DimentionState.LENGTH && (_lengthWidthHeight[0] == 0)){
                     _lengthWidthHeight[0] =  distanceMeters;
                     tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
-
+                    DIMENTION_STATE = DimentionState.NONE;
+                    tvLength.setBackgroundColor(android.graphics.Color.BLACK);
 
                 }else if(DIMENTION_STATE == DimentionState.WIDTH && (_lengthWidthHeight[1] == 0) ){
                     _lengthWidthHeight[1] =  distanceMeters;
                     tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
+                    DIMENTION_STATE = DimentionState.NONE;
+                    tvWidth.setBackgroundColor(android.graphics.Color.BLACK);
 
                 }else if(DIMENTION_STATE == DimentionState.HEIGHT && (_lengthWidthHeight[2] == 0)) {
                     _lengthWidthHeight[2] = distanceMeters;
                     tvHeight.setText("H: " + String.valueOf(_lengthWidthHeight[2]));
+                    DIMENTION_STATE = DimentionState.NONE;
+                    tvHeight.setBackgroundColor(android.graphics.Color.BLACK);
 
                 }
 
@@ -266,36 +271,24 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
     @SuppressLint("ResourceAsColor")
     public void tappedToSetDimentionStateToLength(View v){
-        if(DIMENTION_STATE == DimentionState.LENGTH){
-            DIMENTION_STATE = DimentionState.NONE;
-            tvLength.setBackgroundColor(android.graphics.Color.BLACK);
-            _lengthWidthHeight[0] = 0;
-        }else{
+
             DIMENTION_STATE = DimentionState.LENGTH;
             tvLength.setBackgroundColor(android.graphics.Color.BLUE);
-        }
+
     }
 
     public void tappedToSetDimentionStateToWidth(View v){
-        if(DIMENTION_STATE == DimentionState.WIDTH){
-            DIMENTION_STATE = DimentionState.NONE;
-            tvWidth.setBackgroundColor(android.graphics.Color.BLACK);
-            _lengthWidthHeight[1] = 0;
-        }else {
+
             DIMENTION_STATE = DimentionState.WIDTH;
             tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
-        }
+
     }
 
     public void tappedToSetDimentionStateToHeight(View v){
-        if(DIMENTION_STATE == DimentionState.HEIGHT){
-            DIMENTION_STATE = DimentionState.NONE;
-            tvHeight.setBackgroundColor(android.graphics.Color.BLACK);
-            _lengthWidthHeight[2] = 0;
-        }else{
+
             DIMENTION_STATE = DimentionState.HEIGHT;
             tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
-        }
+
 
 
     }
