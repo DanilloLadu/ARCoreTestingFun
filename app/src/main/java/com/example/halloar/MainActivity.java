@@ -92,36 +92,35 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
             //clearAnchor();
 
-            if(!FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS)
-            {
-                _firstCurrentAnchor = anchor;
-                _firstCurrentAnchorNode = anchorNode;
+            if(!(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS)) {
 
-                FIRST_NODE_EXISTS = true;
+                if (!FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS) {
+                    _firstCurrentAnchor = anchor;
+                    _firstCurrentAnchorNode = anchorNode;
 
-            }else if(FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS){
-                _secondCurrentAnchor = anchor;
-                _secondCurrentAnchorNode = anchorNode;
+                    FIRST_NODE_EXISTS = true;
 
-                SECOND_NODE_EXISTS = true;
-            }else if(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS){
+                } else if (FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS) {
+                    _secondCurrentAnchor = anchor;
+                    _secondCurrentAnchorNode = anchorNode;
 
+                    SECOND_NODE_EXISTS = true;
+                }
+
+                TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
+                node.setRenderable(cubeRenderable);
+                node.setParent(anchorNode);
+                arFragment.getArSceneView().getScene().addOnUpdateListener(this);
+                arFragment.getArSceneView().getScene().addChild(anchorNode);
+                node.select();
+
+
+            }else{
                 clearAnchors();
-                _firstCurrentAnchor = anchor;
-                _firstCurrentAnchorNode = anchorNode;
-                FIRST_NODE_EXISTS = true;
-
             }
 
 
 
-
-            TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
-            node.setRenderable(cubeRenderable);
-            node.setParent(anchorNode);
-            arFragment.getArSceneView().getScene().addOnUpdateListener(this);
-            arFragment.getArSceneView().getScene().addChild(anchorNode);
-            node.select();
 
 
         });
@@ -227,19 +226,19 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
 
 
-                if(DIMENTION_STATE == DimentionState.LENGTH && (_lengthWidthHeight[0] == 0)){
+                if(DIMENTION_STATE == DimentionState.LENGTH ){
                     _lengthWidthHeight[0] =  distanceMeters;
                     tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
                     DIMENTION_STATE = DimentionState.NONE;
                     tvLength.setBackgroundColor(android.graphics.Color.BLACK);
 
-                }else if(DIMENTION_STATE == DimentionState.WIDTH && (_lengthWidthHeight[1] == 0) ){
+                }else if(DIMENTION_STATE == DimentionState.WIDTH  ){
                     _lengthWidthHeight[1] =  distanceMeters;
                     tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
                     DIMENTION_STATE = DimentionState.NONE;
                     tvWidth.setBackgroundColor(android.graphics.Color.BLACK);
 
-                }else if(DIMENTION_STATE == DimentionState.HEIGHT && (_lengthWidthHeight[2] == 0)) {
+                }else if(DIMENTION_STATE == DimentionState.HEIGHT ) {
                     _lengthWidthHeight[2] = distanceMeters;
                     tvHeight.setText("H: " + String.valueOf(_lengthWidthHeight[2]));
                     DIMENTION_STATE = DimentionState.NONE;
