@@ -37,10 +37,15 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private int[] _lengthWidthHeight = new int[3];
+
+
+    private Boolean FIRST_NODE_EXISTS = false;
     private Boolean SECOND_NODE_EXISTS = false;
     private AnchorNode _firstCurrentAnchorNode;
     private AnchorNode _secondCurrentAnchorNode;
     private TextView tvDistance;
+    private TextView tvLength;
     ModelRenderable cubeRenderable;
     private Anchor _firstCurrentAnchor = null;
     private Anchor _secondCurrentAnchor = null;
@@ -68,14 +73,11 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         initModel();
 
-        android.graphics.Point center = getScreenCenter();
+
 
         arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
             if (cubeRenderable == null)
                 return;
-
-            //motionEvent.setLocation(center.x,center.y);
-            // Creating Anchor.
 
             Anchor anchor = hitResult.createAnchor();
 
@@ -85,15 +87,27 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             //clearAnchor();
 
             if(!SECOND_NODE_EXISTS)
+            if(!FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS)
             {
                 _firstCurrentAnchor = anchor;
                 _firstCurrentAnchorNode = anchorNode;
-                SECOND_NODE_EXISTS = true;
 
-            }else{
+                FIRST_NODE_EXISTS = true;
+
+            }else if(FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS){
                 _secondCurrentAnchor = anchor;
                 _secondCurrentAnchorNode = anchorNode;
+
+                SECOND_NODE_EXISTS = true;
+            }else if(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS){
+
+                clearAnchors();
+                _firstCurrentAnchor = anchor;
+                _firstCurrentAnchorNode = anchorNode;
+                FIRST_NODE_EXISTS = true;
+
             }
+
 
 
 
@@ -137,9 +151,27 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                         });
     }
 
-    private void clearAnchor() {
+    private void clearAnchors() {
 
-        if(!SECOND_NODE_EXISTS) {
+        arFragment.getArSceneView().getScene().removeChild(_firstCurrentAnchorNode);
+        _firstCurrentAnchorNode.getAnchor().detach();
+        _firstCurrentAnchorNode.setParent(null);
+        _firstCurrentAnchorNode = null;
+        _firstCurrentAnchor = null;
+
+        arFragment.getArSceneView().getScene().removeChild(_secondCurrentAnchorNode);
+        _secondCurrentAnchorNode.getAnchor().detach();
+        _secondCurrentAnchorNode.setParent(null);
+        _secondCurrentAnchorNode = null;
+        _secondCurrentAnchor = null;
+
+        FIRST_NODE_EXISTS = false;
+        SECOND_NODE_EXISTS = false;
+
+
+
+        /**
+        if(SECOND_NODE_EXISTS) {
             _firstCurrentAnchor = null;
 
 
@@ -160,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 _secondCurrentAnchorNode = null;
             }
         }
+
+         */
     }
 
     @Override
@@ -168,12 +202,13 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         Log.d("API123", "onUpdateframe... current anchor node " + (_firstCurrentAnchorNode == null));
 
-        if(!SECOND_NODE_EXISTS){
-            tvDistance.setText("Select two points");
-            SECOND_NODE_EXISTS = true;
+        tvDistance.setText("No point selected");
+        if(FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS){
+            tvDistance.setText("Select second point");
 
-        }else{
-            if (_secondCurrentAnchorNode != null) {
+
+        }else if(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS){
+
                 Pose firstPose = _firstCurrentAnchor.getPose();
                 Pose secondPose = _secondCurrentAnchor.getPose();
 
@@ -191,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             float totalDistanceSquared = 0;
             for (int i = 0; i < 3; ++i)
                 totalDistanceSquared += distance_vector[i] * distance_vector[i];*/
-            }
+
 
 
         }

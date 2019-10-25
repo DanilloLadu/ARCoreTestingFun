@@ -21,4 +21,41 @@
       android:textColor="@android:color/white"
       android:textSize="20sp" />
 
+  <TextView
+      android:id="@+id/tvLength"
+      android:layout_width="109dp"
+      android:layout_height="62dp"
+      android:layout_gravity="top"
+      android:background="@android:color/black"
+      android:gravity="center"
+      android:padding="8dp"
+      android:text="L"
+      android:textColor="@android:color/white"
+      android:textSize="20sp" />
+
+  <TextView
+      android:id="@+id/tvWidth"
+      android:layout_width="109dp"
+      android:layout_height="62dp"
+      android:layout_gravity="top|center"
+      android:background="@android:color/black"
+      android:gravity="center"
+      android:padding="8dp"
+      android:text="B"
+      android:textColor="@android:color/white"
+      android:textSize="20sp" />
+
+  <TextView
+      android:id="@+id/tvHeight"
+      android:layout_width="109dp"
+      android:layout_height="62dp"
+      android:layout_gravity="top|right"
+      android:background="@android:color/black"
+      android:gravity="center"
+      android:padding="8dp"
+      android:text="H"
+      android:textColor="@android:color/white"
+      android:textSize="20sp" />
+
+
 </FrameLayout>
