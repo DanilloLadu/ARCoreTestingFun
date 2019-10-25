@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
             //clearAnchor();
 
-            if(!SECOND_NODE_EXISTS)
             if(!FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS)
             {
                 _firstCurrentAnchor = anchor;
