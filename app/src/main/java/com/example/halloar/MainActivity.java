@@ -55,10 +55,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private Anchor _secondCurrentAnchor = null;
 
 
-    private android.graphics.Point getScreenCenter() {
-        View vw = findViewById(android.R.id.content);
-        return new android.graphics.Point(vw.getWidth()/2, vw.getHeight()/2);
-    }
 
 
     @Override
@@ -79,25 +75,19 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         initModel();
 
-
-
         arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
             if (cubeRenderable == null)
                 return;
 
             Anchor anchor = hitResult.createAnchor();
-
             AnchorNode anchorNode = new AnchorNode(anchor);
             anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-            //clearAnchor();
 
             if(!(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS)) {
 
                 if (!FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS) {
                     _firstCurrentAnchor = anchor;
                     _firstCurrentAnchorNode = anchorNode;
-
                     FIRST_NODE_EXISTS = true;
 
                 } else if (FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS) {
@@ -114,18 +104,10 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 arFragment.getArSceneView().getScene().addChild(anchorNode);
                 node.select();
 
-
             }else{
                 clearAnchors();
             }
-
-
-
-
-
         });
-
-
     }
 
     public boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
@@ -173,31 +155,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         SECOND_NODE_EXISTS = false;
 
 
-
-        /**
-        if(SECOND_NODE_EXISTS) {
-            _firstCurrentAnchor = null;
-
-
-            if (_firstCurrentAnchor != null) {
-                arFragment.getArSceneView().getScene().removeChild(_firstCurrentAnchorNode);
-                _firstCurrentAnchorNode.getAnchor().detach();
-                _firstCurrentAnchorNode.setParent(null);
-                _firstCurrentAnchorNode = null;
-            }
-        }else {
-            _secondCurrentAnchor = null;
-
-
-            if (_secondCurrentAnchorNode != null) {
-                arFragment.getArSceneView().getScene().removeChild(_secondCurrentAnchorNode);
-                _secondCurrentAnchorNode.getAnchor().detach();
-                _secondCurrentAnchorNode.setParent(null);
-                _secondCurrentAnchorNode = null;
-            }
-        }
-
-         */
     }
 
     @Override
@@ -206,11 +163,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         Log.d("API123", "onUpdateframe... current anchor node " + (_firstCurrentAnchorNode == null));
 
-        tvDistance.setText("No point selected");
         if(FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS){
-            tvDistance.setText("Select second point");
-
-
+            setInformationText("Select second point");
         }else if(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS){
 
                 Pose firstPose = _firstCurrentAnchor.getPose();
@@ -222,43 +176,31 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
                 ///Compute the straight-line distance.
                 float distanceMeters = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
-                tvDistance.setText("Difference: " + distanceMeters + " metres");
-
-
+                setInformationText("Difference: " + distanceMeters + " metres");
 
                 if(DIMENTION_STATE == DimentionState.LENGTH ){
                     _lengthWidthHeight[0] =  distanceMeters;
                     tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
                     DIMENTION_STATE = DimentionState.NONE;
-                    tvLength.setBackgroundColor(android.graphics.Color.BLACK);
+                    tvLength.setBackgroundColor(android.graphics.Color.BLUE);
 
                 }else if(DIMENTION_STATE == DimentionState.WIDTH  ){
                     _lengthWidthHeight[1] =  distanceMeters;
                     tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
                     DIMENTION_STATE = DimentionState.NONE;
-                    tvWidth.setBackgroundColor(android.graphics.Color.BLACK);
+                    tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
 
                 }else if(DIMENTION_STATE == DimentionState.HEIGHT ) {
                     _lengthWidthHeight[2] = distanceMeters;
                     tvHeight.setText("H: " + String.valueOf(_lengthWidthHeight[2]));
                     DIMENTION_STATE = DimentionState.NONE;
-                    tvHeight.setBackgroundColor(android.graphics.Color.BLACK);
+                    tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
 
                 }
 
 
-
-            /*float[] distance_vector = currentAnchor.getPose().inverse()
-                    .compose(cameraPose).getTranslation();
-            float totalDistanceSquared = 0;
-            for (int i = 0; i < 3; ++i)
-                totalDistanceSquared += distance_vector[i] * distance_vector[i];*/
-
-
-
         }else{
-
-
+            setInformationText("Select a point");
         }
 
 
@@ -267,29 +209,25 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     }
 
 
-
-    @SuppressLint("ResourceAsColor")
     public void tappedToSetDimentionStateToLength(View v){
-
             DIMENTION_STATE = DimentionState.LENGTH;
             tvLength.setBackgroundColor(android.graphics.Color.BLUE);
-
     }
 
     public void tappedToSetDimentionStateToWidth(View v){
-
             DIMENTION_STATE = DimentionState.WIDTH;
             tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
 
     }
 
     public void tappedToSetDimentionStateToHeight(View v){
-
             DIMENTION_STATE = DimentionState.HEIGHT;
             tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
 
+    }
 
-
+    public void setInformationText(String text){
+            tvDistance.setText(text);
     }
 
 }
