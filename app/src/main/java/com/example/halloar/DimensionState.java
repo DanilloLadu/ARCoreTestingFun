@@ -1,6 +1,6 @@
 package com.example.halloar;
 
-public enum DimentionState {
+public enum DimensionState {
     WIDTH,
     HEIGHT,
     LENGTH,

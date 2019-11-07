@@ -1,13 +1,11 @@
 package com.example.halloar;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.Dimension;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
+import com.google.ar.core.HitResult;
 import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.FrameTime;
@@ -28,7 +27,6 @@ import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.Objects;
 
@@ -42,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
     private float[] _lengthWidthHeight = new float[3];
 
-    private DimentionState DIMENTION_STATE = DimentionState.NONE;
+    private DimensionState DIMENSION_STATE = DimensionState.NONE;
 
     private Boolean FIRST_NODE_EXISTS = false;
     private Boolean SECOND_NODE_EXISTS = false;
@@ -80,36 +78,9 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             if (cubeRenderable == null)
                 return;
 
-            Anchor anchor = hitResult.createAnchor();
-            AnchorNode anchorNode = new AnchorNode(anchor);
-            anchorNode.setParent(arFragment.getArSceneView().getScene());
+            createNode(hitResult);
 
-            if(!(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS)) {
 
-                if (!FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS) {
-                    _firstCurrentAnchor = anchor;
-                    _firstCurrentAnchorNode = anchorNode;
-                    FIRST_NODE_EXISTS = true;
-
-                } else if (FIRST_NODE_EXISTS && !SECOND_NODE_EXISTS) {
-                    _secondCurrentAnchor = anchor;
-                    _secondCurrentAnchorNode = anchorNode;
-                    lineBetweenPoints(_firstCurrentAnchor, _secondCurrentAnchor);
-                    SECOND_NODE_EXISTS = true;
-                }
-
-                TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
-                node.getTranslationController().setEnabled(false); //makes sure you can't move the anchors by dragging
-                node.getScaleController().setEnabled(false);//makes sure you can't scale the anchors by dragging
-                node.setRenderable(cubeRenderable);
-                node.setParent(anchorNode);
-                arFragment.getArSceneView().getScene().addOnUpdateListener(this);
-                arFragment.getArSceneView().getScene().addChild(anchorNode);
-                node.select();
-
-            }else{
-                clearAnchors();
-            }
         });
     }
 
@@ -144,13 +115,13 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         arFragment.getArSceneView().getScene().removeChild(_firstCurrentAnchorNode);
         _firstCurrentAnchorNode.getAnchor().detach();
-        _firstCurrentAnchorNode.setParent(null);
+        //_firstCurrentAnchorNode.setParent(null);
         _firstCurrentAnchorNode = null;
         _firstCurrentAnchor = null;
 
         arFragment.getArSceneView().getScene().removeChild(_secondCurrentAnchorNode);
         _secondCurrentAnchorNode.getAnchor().detach();
-        _secondCurrentAnchorNode.setParent(null);
+        //_secondCurrentAnchorNode.setParent(null);
         _secondCurrentAnchorNode = null;
         _secondCurrentAnchor = null;
 
@@ -167,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             _firstCurrentAnchorNode.setParent(arFragment.getArSceneView().getScene());
             Vector3 point1, point2;
             point1 = _secondCurrentAnchorNode.getWorldPosition();
-            point2 = _firstCurrentAnchorNode.getWorldPosition(); //eventueel niet normalized maken
+            point2 = _firstCurrentAnchorNode.getWorldPosition();
     /*
         First, find the vector extending between the two points and define a look rotation
         in terms of this Vector.
@@ -207,33 +178,25 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             setInformationText("Select second point");
         }else if(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS){
 
-            Pose firstPose = _firstCurrentAnchor.getPose();
-            Pose secondPose = _secondCurrentAnchor.getPose();
-
-            float dx = firstPose.tx() - secondPose.tx();
-            float dy = firstPose.ty() - secondPose.ty();
-            float dz = firstPose.tz() - secondPose.tz();
-
-            ///Compute the straight-line distance.
-            float distanceMeters = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+          float distanceMeters = calculateDistanceBetweenTwoAnchorNodes(_firstCurrentAnchorNode , _secondCurrentAnchorNode);
             setInformationText("Difference: " + distanceMeters + " metres");
 
-            if(DIMENTION_STATE == DimentionState.LENGTH ){
+            if(DIMENSION_STATE == DimensionState.LENGTH ){
                 _lengthWidthHeight[0] =  distanceMeters;
                 tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
-                DIMENTION_STATE = DimentionState.NONE;
+                DIMENSION_STATE = DimensionState.NONE;
                 tvLength.setBackgroundColor(android.graphics.Color.BLUE);
 
-            }else if(DIMENTION_STATE == DimentionState.WIDTH  ){
+            }else if(DIMENSION_STATE == DimensionState.WIDTH  ){
                 _lengthWidthHeight[1] =  distanceMeters;
                 tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
-                DIMENTION_STATE = DimentionState.NONE;
+                DIMENSION_STATE = DimensionState.NONE;
                 tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
 
-            }else if(DIMENTION_STATE == DimentionState.HEIGHT ) {
+            }else if(DIMENSION_STATE == DimensionState.HEIGHT ) {
                 _lengthWidthHeight[2] = distanceMeters;
-                tvHeight.setText("H: " + String.valueOf(_lengthWidthHeight[2]));
-                DIMENTION_STATE = DimentionState.NONE;
+                tvHeight.setText("H: " + _lengthWidthHeight[2]);
+                DIMENSION_STATE = DimensionState.NONE;
                 tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
 
             }
@@ -250,18 +213,18 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
 
     public void tappedToSetDimentionStateToLength(View v){
-        DIMENTION_STATE = DimentionState.LENGTH;
+        DIMENSION_STATE = DimensionState.LENGTH;
         tvLength.setBackgroundColor(android.graphics.Color.BLUE);
     }
 
     public void tappedToSetDimentionStateToWidth(View v){
-        DIMENTION_STATE = DimentionState.WIDTH;
+        DIMENSION_STATE = DimensionState.WIDTH;
         tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
 
     }
 
     public void tappedToSetDimentionStateToHeight(View v){
-        DIMENTION_STATE = DimentionState.HEIGHT;
+        DIMENSION_STATE = DimensionState.HEIGHT;
         tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
 
     }
@@ -270,4 +233,125 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         tvDistance.setText(text);
     }
 
+    public void createNode(HitResult hitResult){
+        Anchor anchor = hitResult.createAnchor();
+        AnchorNode node = new AnchorNode(anchor);
+        node.setParent(arFragment.getArSceneView().getScene());
+
+       if(!(FIRST_NODE_EXISTS && SECOND_NODE_EXISTS)){
+
+           if(!FIRST_NODE_EXISTS){
+               setFirstNode(node);
+           }else {
+               setSecondNode(node);
+           }
+
+           node.setRenderable(cubeRenderable);
+           arFragment.getArSceneView().getScene().addOnUpdateListener(this);
+           arFragment.getArSceneView().getScene().addChild(node);
+       }else{
+           clearAnchors();
+       }
+    }
+
+
+    private void setFirstNode(AnchorNode node) {
+        _firstCurrentAnchor = node.getAnchor();
+        _firstCurrentAnchorNode = node;
+        FIRST_NODE_EXISTS = true;
+    }
+    private void setSecondNode(AnchorNode node) {
+        _secondCurrentAnchor = node.getAnchor();
+        _secondCurrentAnchorNode = node;
+        lineBetweenPoints(_firstCurrentAnchor,_secondCurrentAnchor);
+        SECOND_NODE_EXISTS = true;
+    }
+
+    private float calculateDistanceBetweenTwoAnchorNodes(AnchorNode firstNode , AnchorNode secondNode){
+        float distanceX, distanceY, distanceZ ,distance , roundedDistance;
+
+        Pose firstPose = firstNode.getAnchor().getPose();
+        Pose secondPose = secondNode.getAnchor().getPose();
+
+        distanceX = firstPose.tx() - secondPose.tx();
+        distanceY = firstPose.ty() - secondPose.ty();
+        distanceZ = firstPose.tz() - secondPose.tz();
+
+        distance = (float) Math.sqrt(distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ);
+        roundedDistance = (float) ( Math.round(distance * 1000)) / 1000;
+
+        return roundedDistance;
+
+    }
+
+    private void setMeasurementInTextView(float distance){
+
+        if(DIMENSION_STATE == DimensionState.LENGTH){
+            _lengthWidthHeight[0] =  distance;
+            tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
+            DIMENSION_STATE = DimensionState.NONE;
+            tvLength.setBackgroundColor(android.graphics.Color.BLUE);
+        }else if (DIMENSION_STATE == DimensionState.WIDTH) {
+            _lengthWidthHeight[1] =  distance;
+            tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
+            DIMENSION_STATE = DimensionState.NONE;
+            tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
+        }else if (DIMENSION_STATE == DimensionState.HEIGHT){
+            _lengthWidthHeight[2] = distance;
+            tvHeight.setText("H: " + String.valueOf(_lengthWidthHeight[2]));
+            DIMENSION_STATE = DimensionState.NONE;
+            tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
+        }
+    }
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
