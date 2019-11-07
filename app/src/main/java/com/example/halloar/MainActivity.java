@@ -1,6 +1,6 @@
 package com.example.halloar;
 
-import androidx.annotation.Dimension;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -50,9 +50,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private TextView tvLength;
     private TextView tvWidth;
     private TextView tvHeight;
-    ModelRenderable cubeRenderable;
-    private Anchor _firstCurrentAnchor = null;
-    private Anchor _secondCurrentAnchor = null;
+    private ModelRenderable cubeRenderable;
+
 
 
 
@@ -104,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         MaterialFactory.makeTransparentWithColor(this, new Color(android.graphics.Color.RED))
                 .thenAccept(
                         material -> {
-                            Vector3 vector3 = new Vector3(0.05f, 0.01f, 0.01f);
                             cubeRenderable = ShapeFactory.makeCylinder(0.01f,0.04f, Vector3.zero(), material);
                             cubeRenderable.setShadowCaster(false);
                             cubeRenderable.setShadowReceiver(false);
@@ -115,15 +113,13 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         arFragment.getArSceneView().getScene().removeChild(_firstCurrentAnchorNode);
         _firstCurrentAnchorNode.getAnchor().detach();
-        //_firstCurrentAnchorNode.setParent(null);
         _firstCurrentAnchorNode = null;
-        _firstCurrentAnchor = null;
+
 
         arFragment.getArSceneView().getScene().removeChild(_secondCurrentAnchorNode);
         _secondCurrentAnchorNode.getAnchor().detach();
-        //_secondCurrentAnchorNode.setParent(null);
         _secondCurrentAnchorNode = null;
-        _secondCurrentAnchor = null;
+
 
         FIRST_NODE_EXISTS = false;
         SECOND_NODE_EXISTS = false;
@@ -131,22 +127,16 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
     }
 
-    public void lineBetweenPoints(Anchor _firstCurrentAnchor, Anchor _secondCurrentAnchor) {
-        AnchorNode _firstCurrentAnchorNode = new AnchorNode(_firstCurrentAnchor);
-        AnchorNode _secondCurrentAnchorNode = new AnchorNode(_secondCurrentAnchor);
-        if (_secondCurrentAnchorNode != null) {
-            _firstCurrentAnchorNode.setParent(arFragment.getArSceneView().getScene());
-            Vector3 point1, point2;
-            point1 = _secondCurrentAnchorNode.getWorldPosition();
-            point2 = _firstCurrentAnchorNode.getWorldPosition();
+    public void lineBetweenPoints(AnchorNode _firstCurrentAnchorNode, AnchorNode _secondCurrentAnchorNode) {
+
     /*
         First, find the vector extending between the two points and define a look rotation
         in terms of this Vector.
     */
-            final Vector3 difference = Vector3.subtract(point1, point2);
+            final Vector3 difference = Vector3.subtract(_secondCurrentAnchorNode.getWorldPosition(), _firstCurrentAnchorNode.getWorldPosition());
             final Vector3 directionFromTopToBottom = difference.normalized();
-            final Quaternion rotationFromAToB =
-                    Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+            final Quaternion rotationFromAToB = Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+
             MaterialFactory.makeOpaqueWithColor(getApplicationContext(), new Color(0, 255, 244))
                     .thenAccept(
                             material -> {
@@ -157,16 +147,20 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                                         Vector3.zero(), material);
                             /* Last, set the world rotation of the node to the rotation calculated earlier and set the world position to
                                    the midpoint between the given points . */
-                                Node node = new Node();
-                                node.setParent(_firstCurrentAnchorNode);
-                                node.setRenderable(model);
-                                node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
-                                node.setWorldRotation(rotationFromAToB);
+                                createNodeForLineBetweenPoints(model , rotationFromAToB);
+
                             }
                     );
-            _secondCurrentAnchorNode = _firstCurrentAnchorNode;
-        }
     }
+
+    private void createNodeForLineBetweenPoints(ModelRenderable model , Quaternion rotationFromAToB) {
+        Node node = new Node();
+        node.setParent(_firstCurrentAnchorNode);
+        node.setRenderable(model);
+        node.setWorldPosition(Vector3.add(_secondCurrentAnchorNode.getWorldPosition(), _firstCurrentAnchorNode.getWorldPosition()).scaled(.5f));
+        node.setWorldRotation(rotationFromAToB);
+    }
+
 
     @Override
     public void onUpdate(FrameTime frameTime) {
@@ -181,49 +175,26 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
           float distanceMeters = calculateDistanceBetweenTwoAnchorNodes(_firstCurrentAnchorNode , _secondCurrentAnchorNode);
             setInformationText("Difference: " + distanceMeters + " metres");
 
-            if(DIMENSION_STATE == DimensionState.LENGTH ){
-                _lengthWidthHeight[0] =  distanceMeters;
-                tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
-                DIMENSION_STATE = DimensionState.NONE;
-                tvLength.setBackgroundColor(android.graphics.Color.BLUE);
-
-            }else if(DIMENSION_STATE == DimensionState.WIDTH  ){
-                _lengthWidthHeight[1] =  distanceMeters;
-                tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
-                DIMENSION_STATE = DimensionState.NONE;
-                tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
-
-            }else if(DIMENSION_STATE == DimensionState.HEIGHT ) {
-                _lengthWidthHeight[2] = distanceMeters;
-                tvHeight.setText("H: " + _lengthWidthHeight[2]);
-                DIMENSION_STATE = DimensionState.NONE;
-                tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
-
-            }
-
+            setMeasurementInTextView(distanceMeters);
 
         }else{
             setInformationText("Select a point");
         }
-
-
-
-
     }
 
 
-    public void tappedToSetDimentionStateToLength(View v){
+    public void tappedToSetDimensionStateToLength(View v){
         DIMENSION_STATE = DimensionState.LENGTH;
         tvLength.setBackgroundColor(android.graphics.Color.BLUE);
     }
 
-    public void tappedToSetDimentionStateToWidth(View v){
+    public void tappedToSetDimensionStateToWidth(View v){
         DIMENSION_STATE = DimensionState.WIDTH;
         tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
 
     }
 
-    public void tappedToSetDimentionStateToHeight(View v){
+    public void tappedToSetDimensionStateToHeight(View v){
         DIMENSION_STATE = DimensionState.HEIGHT;
         tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
 
@@ -256,15 +227,13 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
 
     private void setFirstNode(AnchorNode node) {
-        _firstCurrentAnchor = node.getAnchor();
         _firstCurrentAnchorNode = node;
         FIRST_NODE_EXISTS = true;
     }
     private void setSecondNode(AnchorNode node) {
-        _secondCurrentAnchor = node.getAnchor();
         _secondCurrentAnchorNode = node;
-        lineBetweenPoints(_firstCurrentAnchor,_secondCurrentAnchor);
         SECOND_NODE_EXISTS = true;
+        lineBetweenPoints(_firstCurrentAnchorNode,_secondCurrentAnchorNode);
     }
 
     private float calculateDistanceBetweenTwoAnchorNodes(AnchorNode firstNode , AnchorNode secondNode){
@@ -288,70 +257,19 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         if(DIMENSION_STATE == DimensionState.LENGTH){
             _lengthWidthHeight[0] =  distance;
-            tvLength.setText("L: " +String.valueOf(_lengthWidthHeight[0]));
+            tvLength.setText("L: " + _lengthWidthHeight[0]);
             DIMENSION_STATE = DimensionState.NONE;
             tvLength.setBackgroundColor(android.graphics.Color.BLUE);
         }else if (DIMENSION_STATE == DimensionState.WIDTH) {
             _lengthWidthHeight[1] =  distance;
-            tvWidth.setText("B: " +String.valueOf(_lengthWidthHeight[1]));
+            tvWidth.setText("B: " +_lengthWidthHeight[1]);
             DIMENSION_STATE = DimensionState.NONE;
             tvWidth.setBackgroundColor(android.graphics.Color.BLUE);
         }else if (DIMENSION_STATE == DimensionState.HEIGHT){
             _lengthWidthHeight[2] = distance;
-            tvHeight.setText("H: " + String.valueOf(_lengthWidthHeight[2]));
+            tvHeight.setText("H: " + _lengthWidthHeight[2]);
             DIMENSION_STATE = DimensionState.NONE;
             tvHeight.setBackgroundColor(android.graphics.Color.BLUE);
         }
     }
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

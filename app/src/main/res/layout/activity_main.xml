@@ -33,7 +33,7 @@
       android:textColor="@android:color/white"
       android:textSize="20sp"
       android:clickable="true"
-      android:onClick="tappedToSetDimentionStateToLength"/>
+      android:onClick="tappedToSetDimensionStateToLength"/>
 
 
   <TextView
@@ -48,7 +48,7 @@
       android:textColor="@android:color/white"
       android:textSize="20sp"
       android:clickable="true"
-      android:onClick="tappedToSetDimentionStateToWidth"/>
+      android:onClick="tappedToSetDimensionStateToWidth"/>
 
   <TextView
       android:id="@+id/tvHeight"
@@ -62,7 +62,7 @@
       android:textColor="@android:color/white"
       android:textSize="20sp"
       android:clickable="true"
-      android:onClick="tappedToSetDimentionStateToHeight"/>
+      android:onClick="tappedToSetDimensionStateToHeight"/>
 
 
 </FrameLayout>
